@@ -13,7 +13,6 @@ class Membre(models.Model):
 class Comment(models.Model):
     id= fields.IntField(pk =True, index=True)
     comment=fields.CharField(max_length=200)
-    publication=fields.ForeignKeyField("models.Publication", related_name="Comment")
     time=fields.DatetimeField(default=datetime.utcnow)
 
 
@@ -34,11 +33,11 @@ membre_pydantic=pydantic_model_creator(Membre, name="Membre")
 membreIn_pydantic=pydantic_model_creator(Membre, name="MembreIn", exclude="join_time", exclude_readonly=True)
 
 
-comment_pydantic = pydantic_model_creator(Membre, name="Membre")
-commentIn_pydantic = pydantic_model_creator(Membre, name="MembreIn", exclude="time", exclude_readonly=True)
+comment_pydantic = pydantic_model_creator(Comment, name="comment")
+commentIn_pydantic = pydantic_model_creator(Comment, name="commentIn", exclude="time", exclude_readonly=True)
 
 artiste_pydantic=pydantic_model_creator(Artiste, name="Artiste")
-artisteIn_pydantic=pydantic_model_creator(Artiste, name="ArtisteIn", exclude="id")
+artisteIn_pydantic=pydantic_model_creator(Artiste, name="ArtisteIn", exclude_readonly=True)
 
 publication_pydantic=pydantic_model_creator(Publication, name="Publication", exclude="id")
-publicationIn_pydantic=pydantic_model_creator(Publication, name="PublicationIn", exclude_readonly=True)
+publicationIn_pydantic=pydantic_model_creator(Publication, name="PublicationIn",exclude="likes", exclude_readonly=True)

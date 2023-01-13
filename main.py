@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile
 from models import*
 from tortoise.contrib.fastapi import HTTPNotFoundError, register_tortoise
 from pydantic import BaseModel
@@ -44,26 +44,43 @@ async def delete_membre(id:int):
 #les methodes REST pour la gestion des publications
 
 @app.post("/pub", response_model=publication_pydantic)
-async def create_post(pub: publicationIn_pydantic):
-    obj=await Publication.create(**pub.dict(exclude_unset=True))
+async def create_PUBLICATION(pub: publicationIn_pydantic):
+    obj=await Publication.create(**pub.dict(exclude_unset=True, exclude="likes"))
     return await publication_pydantic.from_tortoise_orm(obj)
 
 @app.get("/pub/{id}", response_model=publication_pydantic, responses={404:{"model": HTTPNotFoundError}})
-async def get_post(id:int):
+async def get_PUBLICATION(id:int):
     return await publication_pydantic.from_queryset_single(Publication.get(id=id))
 
 
 @app.put("/pub/{id}", response_model=publication_pydantic, responses={404:{"model":HTTPNotFoundError}})
-async def update_post(id:int, pub:publicationIn_pydantic):
+async def update_PUBLICATION(id:int, pub:publicationIn_pydantic):
     await Publication.filter(id=id).update(**pub.dict())
     return await publication_pydantic.from_queryset_single(Publication.get(id=id))
 
 @app.delete("/pub/{id}", response_model=Message, responses={404:{"model":HTTPNotFoundError}})
-async def delete_post(id:int):
+async def delete_PUBLICATION(id:int):
     delete_obj= await Publication.filter(id=id)
     if not delete_obj:
         raise HTTPException(status_code=404, detail="This pub dosen't exist")
     return Message(message="Successfuly deleted")
+
+#uploading files
+
+'''
+@app.post("/upload")
+async def recieveFile(file: bytes = File(...)):
+    print(file)
+
+
+@app.post("/files")
+async def create_file(file: bytes = File()):
+    return {"file_size" : len(file)}
+'''
+
+@app.post("/uploadfile")
+async def create_upload_file(file: UploadFile):
+    return {"filename": file.filename}
 
 #les methodes REST pour la gestion des commentaires
 
