@@ -19,12 +19,14 @@ class Comment(models.Model):
 class Artiste(models.Model):
     id= fields.IntField(pk =True, index=True)
     name=fields.CharField(max_length=200, null=False, unique=True)
+    photo=fields.BinaryField()
     description=fields.TextField()
 
 class Publication(models.Model):
     id= fields.IntField(pk =True, index=True)
     pub_descrition=fields.CharField(max_length=300, null=False, unique=True)
-    likes=fields.IntField()
+    photo=fields.BinaryField()
+    likes=fields.IntField(default=0)
     post_time=fields.DatetimeField(default=datetime.utcnow)
 
 
@@ -40,4 +42,4 @@ artiste_pydantic=pydantic_model_creator(Artiste, name="Artiste")
 artisteIn_pydantic=pydantic_model_creator(Artiste, name="ArtisteIn", exclude_readonly=True)
 
 publication_pydantic=pydantic_model_creator(Publication, name="Publication", exclude="id")
-publicationIn_pydantic=pydantic_model_creator(Publication, name="PublicationIn",exclude="likes", exclude_readonly=True)
+publicationIn_pydantic=pydantic_model_creator(Publication, name="PublicationIn", exclude_readonly=True)

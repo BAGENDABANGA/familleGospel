@@ -15,6 +15,11 @@ class Message(BaseModel):
 async def index():
     return {"INDEX":"Famille Gospel API"}
 
+#upload files
+
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile):
+    return {"filename": file.filename}
 
 #les methodes REST pour la gestion des membres
 
@@ -44,7 +49,7 @@ async def delete_membre(id:int):
 #les methodes REST pour la gestion des publications
 
 @app.post("/pub", response_model=publication_pydantic)
-async def create_PUBLICATION(pub: publicationIn_pydantic):
+async def create_PUBLICATION(pub: publicationIn_pydantic, data: UploadFile):
     obj=await Publication.create(**pub.dict(exclude_unset=True, exclude="likes"))
     return await publication_pydantic.from_tortoise_orm(obj)
 
@@ -64,23 +69,6 @@ async def delete_PUBLICATION(id:int):
     if not delete_obj:
         raise HTTPException(status_code=404, detail="This pub dosen't exist")
     return Message(message="Successfuly deleted")
-
-#uploading files
-
-'''
-@app.post("/upload")
-async def recieveFile(file: bytes = File(...)):
-    print(file)
-
-
-@app.post("/files")
-async def create_file(file: bytes = File()):
-    return {"file_size" : len(file)}
-'''
-
-@app.post("/uploadfile")
-async def create_upload_file(file: UploadFile):
-    return {"filename": file.filename}
 
 #les methodes REST pour la gestion des commentaires
 
@@ -110,7 +98,7 @@ async def delete_comment(id:int):
 
 
 @app.post("/artiste", response_model=artiste_pydantic)
-async def create_artiste(artiste: artisteIn_pydantic):
+async def create_artiste(artiste: artisteIn_pydantic, file: UploadFile):
     obj=await Artiste.create(**artiste.dict(exclude_unset=True))
     return await artiste_pydantic.from_tortoise_orm(obj)
 
@@ -136,7 +124,7 @@ async def delete_artiste(id:int):
 
 register_tortoise(
     app,
-    db_url="sqlite://gospellff",
+    db_url="sqlite://gospellff.db",
     modules={'models':['models']},
     generate_schemas=True,
     add_exception_handlers=True
